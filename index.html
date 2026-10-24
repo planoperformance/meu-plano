@@ -1,0 +1,586 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0B6E78">
+<meta name="description" content="Plano de performance para atletas: reconheça a emoção, escolha uma estratégia e registre o que funciona.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Meu Plano">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<style>html{-webkit-text-size-adjust:100%}:root{padding-top:env(safe-area-inset-top,0px)}body{margin:0}</style>
+<title>Meu Plano de Performance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: app de uma coluna, feito para o celular. Cabeçalho, 4 etapas (Pause, Perceba, Escolha, Avalie), conteúdo e barra inferior com Plano, Sons e Histórico. */
+:root{
+  --bg:#EAF0EF; --surface:#F8FBFA; --fg:#10262B; --muted:#4D6569; --line:#C6D8D6;
+  --accent:#0B6E78; --accent-ink:#FFFFFF; --accent-soft:#CDE8E6; --signal:#C77E10; --signal-soft:#F7E6C6;
+  --good:#1F7A4D; --good-soft:#D3EBDD;
+  --display:'Bricolage Grotesque','Trebuchet MS',system-ui,sans-serif;
+  --body:'Figtree',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0B191D; --surface:#12282D; --fg:#E3F0EE; --muted:#93AFB0; --line:#244149;
+    --accent:#5CC4C8; --accent-ink:#052428; --accent-soft:#17383D; --signal:#F0B65A; --signal-soft:#3A2F17;
+    --good:#6CCB98; --good-soft:#163425; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0B191D; --surface:#12282D; --fg:#E3F0EE; --muted:#93AFB0; --line:#244149;
+  --accent:#5CC4C8; --accent-ink:#052428; --accent-soft:#17383D; --signal:#F0B65A; --signal-soft:#3A2F17;
+  --good:#6CCB98; --good-soft:#163425; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:400 16px/1.5 var(--body);
+  padding-block:12px 112px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));}
+.app{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+button,input,textarea{font:inherit;color:inherit}
+h1,h2,h3,p{margin:0}
+h1{font:800 clamp(28px,8vw,38px)/1.05 var(--display);letter-spacing:-.02em;text-wrap:balance}
+h2{font:700 18px/1.2 var(--display);letter-spacing:-.01em}
+.eyebrow{font:700 12px/1 var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.lead{color:var(--muted);max-width:60ch}
+.small{font-size:14px;color:var(--muted)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+#hdr{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font:800 15px/1 var(--display);letter-spacing:.04em;text-transform:uppercase}
+.brand span{color:var(--accent)}
+.live{display:inline-flex;align-items:center;gap:8px;border:1.5px solid var(--accent);background:var(--accent-soft);
+  border-radius:999px;padding:6px 12px;font:600 13px var(--body);cursor:pointer}
+.live i{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.25}}
+
+.steps{list-style:none;margin:0;padding:0;display:flex;gap:6px}
+.steps li{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;font:600 12px/1.1 var(--body);color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.steps .bar{height:5px;border-radius:3px;background:var(--line)}
+.steps li.done .bar{background:var(--accent)}
+.steps li.cur .bar{background:var(--accent)}
+.steps li.cur{color:var(--fg)}
+.steps b{font-weight:700}
+
+main{display:flex;flex-direction:column;gap:18px;min-width:0}
+section{display:flex;flex-direction:column;gap:16px;min-width:0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.note{background:var(--signal-soft);border-radius:12px;padding:12px 14px;font-size:15px}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:9px 15px;border:1.5px solid var(--line);
+  background:var(--surface);border-radius:999px;font-weight:600;font-size:15px;cursor:pointer;text-align:left}
+.chip[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.dot{width:11px;height:11px;border-radius:50%;background:var(--c,var(--accent));flex:none}
+.big-chips .chip{font-size:17px;min-height:52px;padding:10px 18px}
+
+.scale{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.scale button{min-height:48px;border:1.5px solid var(--line);background:var(--surface);border-radius:12px;font:700 18px var(--display);cursor:pointer}
+.scale button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent);color:var(--accent-ink)}
+.scale-labels{display:flex;justify-content:space-between;font-size:13px;color:var(--muted)}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:12px 22px;border-radius:14px;border:0;
+  background:var(--accent);color:var(--accent-ink);font:700 16px var(--body);cursor:pointer;text-align:center}
+.btn.ghost{background:transparent;color:var(--fg);border:1.5px solid var(--line)}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.btnrow{display:flex;flex-wrap:wrap;gap:10px}
+.btnrow .btn{flex:1 1 140px}
+.back{align-self:flex-start;background:none;border:0;color:var(--accent);font:600 15px var(--body);padding:6px 0;cursor:pointer}
+
+label.lbl{font:600 15px var(--body)}
+input[type=text],textarea{width:100%;background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;min-height:48px}
+textarea{resize:vertical;min-height:76px}
+input[type=range]{width:100%;accent-color:var(--accent)}
+
+.strat{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;padding:14px 16px;
+  border:1.5px solid var(--line);background:var(--surface);border-radius:14px;cursor:pointer}
+.strat.top{border-color:var(--accent)}
+.strat b{display:block;font:700 17px/1.2 var(--display)}
+.strat small{color:var(--muted);font-size:14px}
+.tag{font:700 11px/1 var(--body);letter-spacing:.08em;text-transform:uppercase;background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:5px 9px;white-space:nowrap}
+.list{display:flex;flex-direction:column;gap:10px}
+details summary{cursor:pointer;font-weight:600;padding:6px 0;color:var(--accent)}
+
+.orbwrap{height:min(64vw,250px);display:grid;place-items:center}
+.orb{width:min(64vw,250px);max-width:100%;aspect-ratio:1;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,var(--accent-soft),var(--accent));
+  transform:scale(.62);transition:transform 4s ease-in-out}
+.orblabel{text-align:center;font:700 22px var(--display)}
+.cd{text-align:center;font:800 44px var(--display);font-variant-numeric:tabular-nums;color:var(--accent)}
+.bigtext{font:700 clamp(22px,6vw,28px)/1.25 var(--display);text-wrap:balance}
+.phrase{font:800 clamp(26px,7.5vw,34px)/1.1 var(--display);text-align:center;padding:22px 8px;text-wrap:balance}
+
+.steprow{display:flex;gap:10px;align-items:center}
+.steprow input[type=checkbox]{width:24px;height:24px;accent-color:var(--accent);flex:none}
+
+.snd{width:100%;display:flex;justify-content:space-between;align-items:center;gap:12px;text-align:left;padding:14px 16px;
+  border:1.5px solid var(--line);background:var(--surface);border-radius:14px;cursor:pointer}
+.snd b{display:block;font:700 17px var(--display)}
+.snd small{color:var(--muted);font-size:14px}
+.snd.on{border-color:var(--accent);background:var(--accent-soft)}
+.pill{font:700 12px/1 var(--body);border-radius:999px;padding:6px 10px;border:1.5px solid var(--line);white-space:nowrap}
+.snd.on .pill{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.pill.good{background:var(--good-soft);color:var(--good);border-color:transparent}
+.pill.warn{background:var(--signal-soft);color:var(--signal);border-color:transparent}
+.sndpanel{display:flex;flex-direction:column;gap:14px}
+.sndlist{display:flex;flex-direction:column;gap:10px}
+
+.entry{display:flex;flex-direction:column;gap:8px}
+.entry .top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}
+.entry .when{font-size:13px;color:var(--muted)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:15px}
+.kv dt{color:var(--muted)} .kv dd{margin:0;min-width:0;overflow-wrap:anywhere}
+.arrow{font-variant-numeric:tabular-nums;font-weight:700}
+.sample{border-style:dashed}
+textarea.ficha{min-height:200px;font:13px/1.45 ui-monospace,Menlo,Consolas,monospace}
+
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--surface);border-top:1px solid var(--line);
+  padding-top:8px;padding-bottom:calc(8px + env(safe-area-inset-bottom,0px));
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.tabbar .in{max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.tabbar button{position:relative;min-height:48px;border:0;background:none;border-radius:12px;font:700 14px var(--body);color:var(--muted);cursor:pointer}
+.tabbar button[aria-current="page"]{background:var(--accent-soft);color:var(--fg)}
+.badge{position:absolute;top:4px;right:18%;background:var(--signal);color:#fff;border-radius:999px;font:700 11px/1 var(--body);padding:4px 6px}
+
+.toast{position:fixed;left:50%;transform:translateX(-50%) translateY(20px);bottom:calc(84px + env(safe-area-inset-bottom,0px));
+  background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:600;font-size:14px;opacity:0;pointer-events:none;
+  transition:opacity .2s,transform .2s;max-width:calc(100vw - 32px);z-index:9}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+@media (prefers-reduced-motion: reduce){
+  .orb{transition:none!important}.live i{animation:none}.toast{transition:none}
+}
+</style>
+
+<div class="app">
+  <header id="hdr"></header>
+  <ol class="steps" id="stepper" aria-label="Etapas do plano"></ol>
+  <main id="main"></main>
+</div>
+<nav class="tabbar" aria-label="Seções do app"><div class="in" id="tabbar"></div></nav>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+'use strict';
+var $=function(s,r){return (r||document).querySelector(s)};
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+
+/* ---------- armazenamento (somente neste aparelho) ---------- */
+var K_E='mpp.v1.entries', mem={};
+function lsGet(k,def){try{var v=localStorage.getItem(k);if(v)return JSON.parse(v)}catch(e){}return (k in mem)?mem[k]:def}
+function lsSet(k,v){mem[k]=v;try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+
+/* ---------- conteúdo ---------- */
+var EMOTIONS=[
+ {id:'ansiedade',label:'Ansiedade',c:'#E0A030',note:'Sentir ansiedade antes de competir é comum. O objetivo não é eliminá-la, e sim decidir como agir mesmo assim.'},
+ {id:'medo',label:'Medo de errar',c:'#8E7CC3',note:'O medo de errar puxa a atenção para o resultado. Vale trazer o foco de volta para a próxima ação.'},
+ {id:'raiva',label:'Raiva',c:'#D9604C',note:'A raiva traz energia. O passo é direcioná-la sem perder o controle da próxima ação.'},
+ {id:'frustracao',label:'Frustração',c:'#C9668A',note:'A frustração costuma vir depois de um erro ou de algo que não saiu como esperado. A próxima tentativa é uma nova informação.'},
+ {id:'desanimo',label:'Vontade de desistir',c:'#6F8FA6',note:'Vontade de desistir também é um sinal para observar. Vale reduzir a tarefa a um passo pequeno ou pedir apoio.'},
+ {id:'confianca',label:'Confiança',c:'#3FA97C',note:'Confiança é um recurso. Vale perceber o que a sustenta para repetir depois.'},
+ {id:'outro',label:'Outro',c:'#8A9A9C',note:'Se nenhuma opção descreve o que você sente, tudo bem. Observe o corpo e os pensamentos e escolha um passo.'}
+];
+var SIGNS=[
+ {id:'pensamentos',label:'Pensamentos acelerados'},
+ {id:'tensao',label:'Tensão no corpo'},
+ {id:'distracao',label:'Distração'},
+ {id:'desistir',label:'Vontade de desistir'},
+ {id:'resultado',label:'Pensando só no resultado'},
+ {id:'travado',label:'Travado, sem reação'},
+ {id:'cobranca',label:'Cobrança de fora pesando'}
+];
+var CTX=['Antes do treino','Antes da competição','Após um erro','Após o treino','Em pausa segura'];
+var STRATS={
+ respirar:{t:'Respiração confortável',d:'1 minuto, guiada'},
+ frase:{t:'Frase de foco',d:'30 segundos'},
+ etapas:{t:'Uma etapa de cada vez',d:'1 minuto'},
+ apoio:{t:'Pedir orientação ou apoio',d:'30 segundos'},
+ mindful:{t:'Atenção plena em 5 passos',d:'2 minutos, guiada'},
+ relax:{t:'Soltar a tensão do corpo',d:'2 minutos, guiada'},
+ sons:{t:'Som calmante',d:'Chuva, ondas ou tom suave'},
+ reforco:{t:'Manter o que está funcionando',d:'3 perguntas rápidas'}
+};
+var BASE={
+ ansiedade:['respirar','frase','mindful','etapas','relax','apoio','sons'],
+ medo:['frase','etapas','respirar','apoio','mindful','relax','sons'],
+ raiva:['respirar','relax','frase','apoio','etapas','mindful','sons'],
+ frustracao:['etapas','frase','respirar','apoio','mindful','relax','sons'],
+ desanimo:['etapas','apoio','frase','mindful','respirar','relax','sons'],
+ confianca:['reforco','frase','etapas','respirar','sons'],
+ outro:['respirar','frase','apoio','etapas','mindful','relax','sons']
+};
+var BOOST={tensao:['relax','respirar'],pensamentos:['mindful','respirar'],distracao:['etapas','mindful'],desistir:['apoio','etapas'],resultado:['etapas','frase'],travado:['relax','respirar'],cobranca:['apoio','frase']};
+var PHRASES={
+ ansiedade:['Uma ação de cada vez.','Eu me preparei para isso.','Respiro e volto ao que eu controlo.'],
+ medo:['Foco na próxima ação.','Errar faz parte de aprender.','Faço o que treinei.'],
+ raiva:['Solto os ombros e volto ao movimento.','Energia a meu favor.','Calma e firmeza.'],
+ frustracao:['Próxima tentativa, nova chance.','Aprendo e sigo.','Um ajuste de cada vez.'],
+ desanimo:['Só o próximo passo.','Começo pequeno.','Peço ajuda e sigo.'],
+ confianca:['Mantenho o plano.','Eu sei o que fazer.','Foco e ritmo.'],
+ outro:['Uma ação de cada vez.','Foco no que eu controlo.','Respiro e sigo.']
+};
+var RUN={
+ mindful:{title:'Atenção plena em 5 passos',steps:[
+  {t:'Apoie os pés no chão e sinta o peso do corpo.',s:0},
+  {t:'Olhe ao redor e nomeie em silêncio três coisas que você vê.',s:0},
+  {t:'Perceba duas coisas que você ouve, de perto ou de longe.',s:0},
+  {t:'Sinta o contato das mãos com algo: material de treino, roupa ou o próprio corpo.',s:0},
+  {t:'Acompanhe três respirações, sem mudar o ritmo.',s:20},
+  {t:'Escolha a próxima ação e volte ao treino.',s:0}]},
+ relax:{title:'Soltar a tensão do corpo',steps:[
+  {t:'Aperte as mãos com força moderada, sem dor.',s:5},
+  {t:'Solte. Perceba os dedos e as palmas relaxando.',s:8},
+  {t:'Eleve os ombros em direção às orelhas.',s:5},
+  {t:'Solte os ombros devagar.',s:8},
+  {t:'Aperte levemente a mandíbula.',s:5},
+  {t:'Solte e deixe a boca entreaberta.',s:8},
+  {t:'Faça uma respiração confortável e leve o foco para a próxima ação.',s:0}]}
+};
+var SOUNDS=[
+ {id:'rain',name:'Chuva suave',desc:'Ruído contínuo, bom para quebrar o ciclo de pensamentos'},
+ {id:'waves',name:'Ondas',desc:'Vai e vem lento, acompanha a respiração'},
+ {id:'pad',name:'Tom suave',desc:'Acorde grave e estável, sem melodia'}
+];
+var HELP={sim:'Ajudou',pouco:'Ajudou um pouco',nao:'Não ajudou'};
+var USEI={sim:'Sim',parte:'Em parte',nao:'Não'};
+
+/* ---------- som (gerado no aparelho, sem arquivos) ---------- */
+var Snd={ctx:null,master:null,nodes:[],current:null,timer:null,timerMin:0,vol:.5,gain:null,
+ init:function(){
+  if(!this.ctx){var AC=window.AudioContext||window.webkitAudioContext;if(!AC)return false;
+   try{this.ctx=new AC();}catch(e){return false}
+   this.master=this.ctx.createGain();this.master.gain.value=this.vol;this.master.connect(this.ctx.destination);}
+  if(this.ctx.state==='suspended'){try{this.ctx.resume()}catch(e){}}
+  return true;},
+ buf:function(kind){var c=this.ctx,n=c.sampleRate*4,b=c.createBuffer(1,n,c.sampleRate),d=b.getChannelData(0),last=0,i;
+  for(i=0;i<n;i++){var w=Math.random()*2-1;if(kind==='brown'){last=(last+0.02*w)/1.02;d[i]=last*3.5}else{d[i]=w*0.5}}
+  var f=Math.floor(c.sampleRate*.05);for(i=0;i<f;i++){var k=i/f;d[i]*=k;d[n-1-i]*=k}
+  return b;},
+ loop:function(kind){var s=this.ctx.createBufferSource();s.buffer=this.buf(kind);s.loop=true;this.nodes.push(s);return s;},
+ osc:function(f,det){var o=this.ctx.createOscillator();o.type='sine';o.frequency.value=f;o.detune.value=det||0;this.nodes.push(o);return o;},
+ play:function(id){
+  if(this.current===id){this.stop();return true}
+  if(!this.init())return false;
+  this.stop(true);
+  var c=this.ctx,g=c.createGain();g.gain.value=0;g.connect(this.master);this.gain=g;
+  if(id==='rain'){
+   var s=this.loop('white'),hp=c.createBiquadFilter(),lp=c.createBiquadFilter();hp.type='highpass';hp.frequency.value=600;lp.type='lowpass';lp.frequency.value=6500;
+   s.connect(hp);hp.connect(lp);lp.connect(g);s.start();
+  }else if(id==='waves'){
+   var b=this.loop('brown'),lp2=c.createBiquadFilter(),wg=c.createGain(),lfo=this.osc(0.09),lg=c.createGain();
+   lp2.type='lowpass';lp2.frequency.value=800;wg.gain.value=.55;lg.gain.value=.4;
+   lfo.connect(lg);lg.connect(wg.gain);b.connect(lp2);lp2.connect(wg);wg.connect(g);b.start();lfo.start();
+  }else{
+   var lp3=c.createBiquadFilter(),pg=c.createGain(),lfo2=this.osc(0.07),lg2=c.createGain();
+   lp3.type='lowpass';lp3.frequency.value=1000;pg.gain.value=.16;lg2.gain.value=.05;
+   lfo2.connect(lg2);lg2.connect(pg.gain);lfo2.start();
+   [[110,-3],[110,3],[164.81,0],[220,2],[277.18,-2]].forEach(function(p){var o=Snd.osc(p[0],p[1]);o.connect(lp3);o.start()});
+   lp3.connect(pg);pg.connect(g);
+  }
+  g.gain.linearRampToValueAtTime(1,c.currentTime+2);
+  this.current=id;
+  if(this.timerMin>0){var self=this;this.timer=setTimeout(function(){self.stop();updateSoundUI()},this.timerMin*60000)}
+  return true;},
+ stop:function(quiet){
+  clearTimeout(this.timer);this.timer=null;
+  var nodes=this.nodes,g=this.gain;this.nodes=[];this.gain=null;this.current=null;
+  if(g&&this.ctx){try{g.gain.cancelScheduledValues(this.ctx.currentTime);g.gain.setValueAtTime(g.gain.value,this.ctx.currentTime);g.gain.linearRampToValueAtTime(0,this.ctx.currentTime+1.2)}catch(e){}}
+  setTimeout(function(){nodes.forEach(function(n){try{n.stop()}catch(e){}try{n.disconnect()}catch(e){}});if(g){try{g.disconnect()}catch(e){}}},1400);
+ },
+ setVol:function(v){this.vol=v;if(this.master)this.master.gain.value=v;}
+};
+
+/* ---------- estado ---------- */
+var tab='plano',screen='pause',entries=lsGet(K_E,[]),practice=null,ev=null,clearAsk=false,timers=[];
+function newDraft(){return {entryId:'',ctx:'',emotion:'',intensity:3,signs:[],focus:'',strategy:'',frase:'',etapas:[]}}
+var d=newDraft();
+function emo(id){return EMOTIONS.filter(function(e){return e.id===id})[0]||EMOTIONS[6]}
+function pending(){return entries.filter(function(e){return e.pending}).length}
+function stopTimers(){timers.forEach(function(t){clearInterval(t)});timers=[]}
+var toastT;function toast(m){var t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove('on')},2600)}
+
+function rank(){
+ var base=BASE[d.emotion]||BASE.outro,score={},ids=Object.keys(STRATS);
+ ids.forEach(function(i){score[i]=0});
+ base.forEach(function(id,i){score[id]+=10-i});
+ d.signs.forEach(function(s){(BOOST[s]||[]).forEach(function(id){if(score[id]!==undefined)score[id]+=3})});
+ return ids.filter(function(id){return base.indexOf(id)>-1}).sort(function(a,b){return score[b]-score[a]});
+}
+function upsertEntry(){
+ var e=entries.filter(function(x){return x.id===d.entryId})[0];
+ if(!e){e={id:Date.now().toString(36),ts:Date.now(),pending:true,usei:'',depois:null,ajudou:'',funcionou:'',ajustar:''};d.entryId=e.id;entries.unshift(e)}
+ e.ctx=d.ctx;e.emotion=d.emotion;e.intensity=d.intensity;e.signs=d.signs.slice();e.focus=d.focus;e.strategy=d.strategy;e.frase=d.frase;e.etapas=d.etapas.slice();
+ lsSet(K_E,entries);
+}
+
+/* ---------- telas ---------- */
+function headerHTML(){
+ return '<div class="brand">Meu plano de <span>performance</span></div>'+
+  (Snd.current?'<button class="live" data-a="tab" data-id="sons"><i></i>Som ligado</button>':'');
+}
+var STEPN={pause:1,perceba:2,escolha:3,pratica:3,depois:4,avaliar:4};
+function stepperHTML(){
+ if(tab!=='plano')return '';
+ var names=['Pause','Perceba','Escolha','Avalie'],cur=STEPN[screen];
+ return names.map(function(n,i){var k=i+1;return '<li class="'+(k<cur?'done':k===cur?'cur':'')+'"'+(k===cur?' aria-current="step"':'')+'><span class="bar"></span><span><b>'+k+'</b> '+n+'</span></li>'}).join('');
+}
+function pauseHTML(){
+ var ec=EMOTIONS.map(function(e){return '<button class="chip" style="--c:'+e.c+'" data-a="emo" data-id="'+e.id+'" aria-pressed="'+(d.emotion===e.id)+'"><span class="dot"></span>'+e.label+'</button>'}).join('');
+ var cx=CTX.map(function(c){return '<button class="chip" data-a="ctx" data-id="'+esc(c)+'" aria-pressed="'+(d.ctx===c)+'">'+c+'</button>'}).join('');
+ return '<section><p class="eyebrow">Pause</p><h1>O que estou sentindo?</h1>'+
+  '<p class="lead">Quando for seguro, pare por um instante. Escolha o que mais se aproxima. Você não precisa explicar nem justificar.</p>'+
+  '<div class="chips big-chips" role="group" aria-label="Emoção">'+ec+'</div>'+
+  '<div class="list"><h2>Quando é?</h2><div class="chips" role="group" aria-label="Momento">'+cx+'</div></div>'+
+  '<button class="btn" data-a="to-perceba" '+(d.emotion?'':'disabled')+'>Continuar</button>'+
+  '<p class="small">Este app apoia o trabalho com a psicóloga e não substitui o acompanhamento. Durante luta ou exercício de risco, não pare para usá-lo: pratique as estratégias antes e use nas pausas seguras. Se estiver se sentindo muito mal, procure ajuda. No Brasil, o CVV atende pelo 188.</p></section>';
+}
+function percebaHTML(){
+ var e=emo(d.emotion);
+ var sg=SIGNS.map(function(s){return '<button class="chip" data-a="sign" data-id="'+s.id+'" aria-pressed="'+(d.signs.indexOf(s.id)>-1)+'">'+s.label+'</button>'}).join('');
+ var sc=[1,2,3,4,5].map(function(n){return '<button data-a="int" data-id="'+n+'" aria-pressed="'+(d.intensity===n)+'" aria-label="Intensidade '+n+'">'+n+'</button>'}).join('');
+ return '<section><button class="back" data-a="to-pause">← Voltar</button><p class="eyebrow">Perceba</p><h1>O que percebo em mim?</h1>'+
+  '<div class="note">'+esc(e.note)+'</div>'+
+  '<div class="list"><h2>Sinais (marque quantos quiser)</h2><div class="chips" role="group" aria-label="Sinais">'+sg+'</div></div>'+
+  '<div class="list"><h2>Quão forte está a '+esc(e.label.toLowerCase())+'?</h2><div class="scale" role="group" aria-label="Intensidade">'+sc+'</div><div class="scale-labels"><span>1 leve</span><span>5 muito forte</span></div></div>'+
+  '<button class="btn" data-a="to-escolha">Continuar</button></section>';
+}
+function escolhaHTML(){
+ var order=rank(),top=order.slice(0,3),rest=order.slice(3);
+ function item(id,isTop){var s=STRATS[id];return '<button class="strat'+(isTop?' top':'')+'" data-a="strat" data-id="'+id+'"><span><b>'+s.t+'</b><small>'+s.d+'</small></span>'+(isTop?'<span class="tag">Sugerida</span>':'<span aria-hidden="true">→</span>')+'</button>'}
+ return '<section><button class="back" data-a="to-perceba">← Voltar</button><p class="eyebrow">Escolha</p><h1>Qual é meu foco agora?</h1>'+
+  '<div class="list"><label class="lbl" for="focus">Uma ação concreta para a próxima tentativa</label>'+
+  '<input id="focus" type="text" data-k="focus" value="'+esc(d.focus)+'" placeholder="Ex.: primeira ação técnica, posição dos pés, olhar o alvo" autocomplete="off"></div>'+
+  '<div class="list"><h2>O que posso fazer agora?</h2><p class="small">A estratégia não precisa eliminar a emoção. Ela ajuda você a agir mesmo sentindo.</p>'+
+  top.map(function(i){return item(i,true)}).join('')+'</div>'+
+  (rest.length?'<details><summary>Outras opções</summary><div class="list" style="margin-top:8px">'+rest.map(function(i){return item(i,false)}).join('')+'</div></details>':'')+
+  '</section>';
+}
+function initPractice(id){
+ var p={kind:id,i:0,phrase:d.frase||'',texts:d.etapas.length?d.etapas.slice():[d.focus||'','',''],checks:[false,false,false],reflect:''};
+ return p;
+}
+function praticaHTML(){
+ var id=practice.kind,s=STRATS[id],body='';
+ if(id==='respirar'){
+  body='<div class="orbwrap"><div class="orb" id="orb"></div></div><p class="orblabel" id="orbLabel">Pronto para começar</p><p class="cd" id="orbCount">60</p>'+
+   '<p class="small">Inspire pelo nariz por 4 segundos e solte devagar por 6. Sem forçar e sem prender o ar. Se sentir tontura, volte ao ritmo normal.</p>'+
+   '<div class="btnrow"><button class="btn" data-a="breath" id="breathBtn">Iniciar</button></div>';
+ }else if(id==='frase'){
+  var ps=(PHRASES[d.emotion]||PHRASES.outro).map(function(p,i){return '<button class="chip" data-a="phrase" data-i="'+i+'" aria-pressed="'+(practice.phrase===p)+'">'+esc(p)+'</button>'}).join('');
+  body='<div class="chips">'+ps+'</div><div class="list"><label class="lbl" for="myphrase">Ou escreva a sua</label><input id="myphrase" type="text" data-k="myphrase" value="'+esc(practice.phrase)+'" maxlength="60" autocomplete="off"></div>'+
+   '<div class="card"><p class="phrase" id="bigphrase">'+(practice.phrase?esc(practice.phrase):'Escolha ou escreva uma frase curta')+'</p></div>'+
+   '<p class="small">Repita três vezes, em voz baixa ou só mentalmente, olhando para a próxima ação.</p>';
+ }else if(id==='etapas'){
+  body='<p class="lead">Divida o que vem agora em até três etapas pequenas. Marque cada uma quando concluir.</p><div class="list">'+
+   [0,1,2].map(function(i){return '<div class="steprow"><input type="checkbox" data-a="chk" data-i="'+i+'" '+(practice.checks[i]?'checked':'')+' aria-label="Etapa '+(i+1)+' concluída"><input type="text" data-k="etapa" data-i="'+i+'" value="'+esc(practice.texts[i]||'')+'" placeholder="Etapa '+(i+1)+(i===0?' (a primeira ação)':'')+'" aria-label="Etapa '+(i+1)+'" autocomplete="off"></div>'}).join('')+'</div>';
+ }else if(id==='apoio'){
+  body='<p class="lead">Pedir orientação é uma decisão de performance. Escolha uma frase clara e curta para dizer a quem pode ajudar (treinador, colega ou psicóloga).</p>'+
+   ['Pode me explicar de novo só o primeiro passo?','Preciso de um minuto para organizar meu foco.','Pode me dar uma orientação mais clara sobre o que fazer agora?'].map(function(t){return '<div class="card"><p class="bigtext">'+t+'</p></div>'}).join('');
+ }else if(id==='reforco'){
+  body='<p class="lead">Perceber o que está dando certo ajuda a repetir depois.</p>'+
+   ['O que estou fazendo bem agora?','Em que parte do corpo ou do pensamento isso aparece?','Como posso repetir isso na próxima tentativa?'].map(function(t){return '<div class="card"><p class="bigtext">'+t+'</p></div>'}).join('')+
+   '<div class="list"><label class="lbl" for="reflect">Anote o que quiser repetir (opcional)</label><textarea id="reflect" data-k="reflect">'+esc(practice.reflect)+'</textarea></div>';
+ }else if(id==='sons'){
+  body='<div class="sndpanel">'+soundPanel()+'</div><p class="small">Use fones de ouvido se estiver em ambiente barulhento. O som toca neste aparelho e para sozinho se você definir um tempo.</p>';
+ }else{
+  var r=RUN[id],st=r.steps[practice.i],last=practice.i===r.steps.length-1;
+  body='<p class="eyebrow">Passo '+(practice.i+1)+' de '+r.steps.length+'</p><p class="bigtext">'+st.t+'</p>'+(st.s?'<p class="cd" id="cd">'+st.s+'</p>':'')+
+   (id==='relax'?'<p class="small">Evite contrair regiões com dor ou lesão.</p>':'')+
+   '<div class="btnrow"><button class="btn ghost" data-a="run-prev" '+(practice.i===0?'disabled':'')+'>Voltar</button><button class="btn" data-a="run-next">'+(last?'Concluir':'Próximo')+'</button></div>';
+ }
+ var foot=(RUN[id]?'':'<button class="btn" data-a="finish">Terminei</button>');
+ return '<section><button class="back" data-a="to-escolha">← Outras estratégias</button><p class="eyebrow">Escolha</p><h1>'+s.t+'</h1>'+
+  (d.focus?'<div class="note">Meu foco: <b>'+esc(d.focus)+'</b></div>':'')+body+foot+'</section>';
+}
+function depoisHTML(){
+ return '<section><p class="eyebrow">Avalie</p><h1>Como foi?</h1><p class="lead">Avalie agora ou depois do treino. Se deixar para depois, o registro fica esperando no Histórico.</p>'+
+  '<div class="btnrow"><button class="btn" data-a="eval-now">Avaliar agora</button><button class="btn ghost" data-a="eval-later">Avaliar depois</button></div></section>';
+}
+function avaliarHTML(){
+ var e=entries.filter(function(x){return x.id===ev.id})[0];if(!e)return '';
+ function seg(key,opts,val){return '<div class="chips" role="group">'+Object.keys(opts).map(function(k){return '<button class="chip" data-a="ev" data-key="'+key+'" data-id="'+k+'" aria-pressed="'+(val===k)+'">'+opts[k]+'</button>'}).join('')+'</div>'}
+ var sc=[1,2,3,4,5].map(function(n){return '<button data-a="ev-int" data-id="'+n+'" aria-pressed="'+(ev.depois===n)+'" aria-label="Intensidade '+n+'">'+n+'</button>'}).join('');
+ return '<section><p class="eyebrow">Avalie</p><h1>Isso me ajudou?</h1>'+
+  '<div class="note">'+esc(emo(e.emotion).label)+' · estratégia: '+esc(STRATS[e.strategy]?STRATS[e.strategy].t:'')+'</div>'+
+  '<div class="list"><h2>Consegui usar a estratégia?</h2>'+seg('usei',USEI,ev.usei)+'</div>'+
+  '<div class="list"><h2>Como está a '+esc(emo(e.emotion).label.toLowerCase())+' agora?</h2><div class="scale" role="group">'+sc+'</div><div class="scale-labels"><span>1 leve</span><span>5 muito forte</span></div><p class="small">Antes estava em '+e.intensity+'. Continuar sentindo é normal: o que importa é conseguir agir.</p></div>'+
+  '<div class="list"><h2>No geral, ajudou?</h2>'+seg('ajudou',HELP,ev.ajudou)+'<p class="small">Se não ajudou, você não fracassou. Isso é uma informação para rever a estratégia com a psicóloga.</p></div>'+
+  '<div class="list"><label class="lbl" for="f1">O que funcionou para mim?</label><textarea id="f1" data-k="funcionou">'+esc(ev.funcionou)+'</textarea></div>'+
+  '<div class="list"><label class="lbl" for="f2">O que preciso ajustar?</label><textarea id="f2" data-k="ajustar">'+esc(ev.ajustar)+'</textarea></div>'+
+  '<button class="btn" data-a="ev-save">Salvar avaliação</button></section>';
+}
+function fmtDate(ts){try{return new Date(ts).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}catch(e){return ''}}
+function entryHTML(e,sample){
+ var em=emo(e.emotion),st=STRATS[e.strategy]?STRATS[e.strategy].t:'';
+ var signs=(e.signs||[]).map(function(s){var f=SIGNS.filter(function(x){return x.id===s})[0];return f?f.label:s}).join(', ');
+ var after=e.pending?'':(e.depois||e.intensity);
+ var pill=e.pending?'<span class="pill warn">Falta avaliar</span>':(e.ajudou?'<span class="pill '+(e.ajudou==='nao'?'warn':'good')+'">'+HELP[e.ajudou]+'</span>':'');
+ var rows='<dt>Emoção</dt><dd><span class="dot" style="--c:'+em.c+';display:inline-block"></span> '+esc(em.label)+' · <span class="arrow">'+e.intensity+(e.pending?'':' → '+after)+'</span></dd>'+
+  (signs?'<dt>Percebi</dt><dd>'+esc(signs)+'</dd>':'')+
+  (e.focus?'<dt>Foco</dt><dd>'+esc(e.focus)+'</dd>':'')+
+  '<dt>Estratégia</dt><dd>'+esc(st)+(e.frase?' · “'+esc(e.frase)+'”':'')+'</dd>'+
+  (e.funcionou?'<dt>Funcionou</dt><dd>'+esc(e.funcionou)+'</dd>':'')+(e.ajustar?'<dt>Ajustar</dt><dd>'+esc(e.ajustar)+'</dd>':'');
+ return '<article class="card entry'+(sample?' sample':'')+'"><div class="top"><div><b>'+esc(e.ctx||'Sem momento definido')+'</b><div class="when">'+(sample?'Exemplo, não salvo':fmtDate(e.ts))+'</div></div>'+pill+'</div><dl class="kv">'+rows+'</dl>'+
+  (e.pending&&!sample?'<button class="btn" data-a="eval-open" data-id="'+e.id+'">Avaliar</button>':'')+'</article>';
+}
+function fichaText(){
+ var out=['MEU PLANO DE PERFORMANCE · ficha de acompanhamento','Registros: '+entries.length,''];
+ entries.slice().reverse().forEach(function(e){
+  var signs=(e.signs||[]).map(function(s){var f=SIGNS.filter(function(x){return x.id===s})[0];return f?f.label:s}).join(', ');
+  out.push(fmtDate(e.ts)+' · '+(e.ctx||'sem momento definido'));
+  out.push('Emoção: '+emo(e.emotion).label+' (intensidade '+e.intensity+(e.pending?'':' → '+(e.depois||e.intensity))+')');
+  if(signs)out.push('O que percebi: '+signs);
+  if(e.focus)out.push('Foco escolhido: '+e.focus);
+  out.push('Estratégia: '+(STRATS[e.strategy]?STRATS[e.strategy].t:'')+(e.frase?' · frase: '+e.frase:''));
+  out.push(e.pending?'Avaliação: pendente':'Usei: '+(USEI[e.usei]||'não informado')+' · Ajudou: '+(HELP[e.ajudou]||'não informado'));
+  if(e.funcionou)out.push('O que funcionou: '+e.funcionou);
+  if(e.ajustar)out.push('O que ajustar: '+e.ajustar);
+  out.push('');
+ });
+ return out.join('\n');
+}
+function historicoHTML(){
+ var h='<section><p class="eyebrow">Histórico</p><h1>O que funciona para mim</h1><p class="lead">Seus registros ficam só neste aparelho. Use a ficha para conversar com a psicóloga sobre situações que se repetem.</p>';
+ var ev2=entries.filter(function(e){return !e.pending&&e.ajudou==='sim'});
+ if(ev2.length){var cnt={};ev2.forEach(function(e){cnt[e.strategy]=(cnt[e.strategy]||0)+1});
+  var best=Object.keys(cnt).sort(function(a,b){return cnt[b]-cnt[a]})[0];
+  h+='<div class="note">Estratégia que mais ajudou até agora: <b>'+esc(STRATS[best]?STRATS[best].t:'')+'</b> ('+cnt[best]+' '+(cnt[best]===1?'vez':'vezes')+').</div>'}
+ if(!entries.length){
+  h+='<p class="small">Nenhum registro ainda. É assim que um registro aparece depois de usar o plano:</p>'+entryHTML({ctx:'Antes da competição',emotion:'ansiedade',intensity:4,depois:2,signs:['resultado','cobranca'],focus:'Primeira ação técnica',strategy:'frase',frase:'Uma ação de cada vez.',pending:false,ajudou:'pouco',funcionou:'Voltei a atenção para a primeira ação.',ajustar:'Praticar a frase antes do treino.'},true)+
+   '<button class="btn" data-a="new">Fazer meu primeiro registro</button>';
+ }else{
+  h+='<div class="list">'+entries.map(function(e){return entryHTML(e,false)}).join('')+'</div>'+
+   '<div class="card"><h2>Ficha para a psicóloga</h2><p class="small">Resumo de todos os registros em texto, pronto para copiar e enviar.</p>'+
+   '<details id="fichaDet"><summary>Ver ficha em texto</summary><textarea class="ficha" id="ficha" readonly>'+esc(fichaText())+'</textarea></details>'+
+   '<div class="btnrow"><button class="btn" data-a="copy">Copiar ficha</button><button class="btn ghost" data-a="new">Novo registro</button></div></div>'+
+   (clearAsk?'<div class="card"><p>Apagar todos os registros deste aparelho? Isso não pode ser desfeito.</p><div class="btnrow"><button class="btn" data-a="clear-yes">Apagar tudo</button><button class="btn ghost" data-a="clear-no">Cancelar</button></div></div>':'<button class="back" data-a="clear-ask">Apagar todos os registros</button>');
+ }
+ return h+'</section>';
+}
+function soundPanel(){
+ var cur=Snd.current;
+ var list=SOUNDS.map(function(s){var on=cur===s.id;return '<button class="snd'+(on?' on':'')+'" data-a="snd" data-id="'+s.id+'" aria-pressed="'+on+'"><span><b>'+s.name+'</b><small>'+s.desc+'</small></span><span class="pill">'+(on?'Parar':'Tocar')+'</span></button>'}).join('');
+ var tm=[[0,'Sem timer'],[5,'5 min'],[10,'10 min'],[20,'20 min']].map(function(t){return '<button class="chip" data-a="snd-timer" data-id="'+t[0]+'" aria-pressed="'+(Snd.timerMin===t[0])+'">'+t[1]+'</button>'}).join('');
+ return '<div class="sndlist">'+list+'</div><div class="list"><label class="lbl" for="vol">Volume</label><input id="vol" type="range" min="0" max="100" value="'+Math.round(Snd.vol*100)+'"></div>'+
+  '<div class="list"><h2>Desligar sozinho</h2><div class="chips" role="group">'+tm+'</div></div>';
+}
+function sonsHTML(){
+ return '<section><p class="eyebrow">Sons</p><h1>Acalmar o ambiente</h1><p class="lead">Sons contínuos ajudam a baixar o ritmo antes de treinar ou de competir. Teste antes, em um momento tranquilo, para saber qual funciona para você.</p>'+
+  '<div class="card sndpanel">'+soundPanel()+'</div>'+
+  '<div class="card"><h2>Prefere música?</h2><p class="small">Procure uma playlist de relaxamento no seu aplicativo preferido e deixe pronta antes do treino. Os links abrem em outra aba.</p>'+
+  '<div class="btnrow"><a class="btn ghost" href="https://open.spotify.com/search/relaxamento" target="_blank" rel="noopener">Buscar no Spotify</a><a class="btn ghost" href="https://www.youtube.com/results?search_query=m%C3%BAsica+relaxante+para+atletas" target="_blank" rel="noopener">Buscar no YouTube</a></div></div></section>';
+}
+function updateSoundUI(){
+ document.querySelectorAll('.sndpanel').forEach(function(el){
+  if(el.classList.contains('card')||el.parentNode.id==='main'||true){el.innerHTML=soundPanel()}
+ });
+ $('#hdr').innerHTML=headerHTML();
+}
+
+function render(){
+ stopTimers();
+ $('#hdr').innerHTML=headerHTML();
+ $('#stepper').innerHTML=stepperHTML();
+ var h='';
+ if(tab==='plano'){h={pause:pauseHTML,perceba:percebaHTML,escolha:escolhaHTML,pratica:praticaHTML,depois:depoisHTML,avaliar:avaliarHTML}[screen]()}
+ else if(tab==='sons')h=sonsHTML();else h=historicoHTML();
+ $('#main').innerHTML=h;
+ var pc=pending();
+ $('#tabbar').innerHTML=[['plano','Plano'],['sons','Sons'],['historico','Histórico']].map(function(t){return '<button data-a="tab" data-id="'+t[0]+'" '+(tab===t[0]?'aria-current="page"':'')+'>'+t[1]+(t[0]==='historico'&&pc?'<span class="badge">'+pc+'</span>':'')+'</button>'}).join('');
+ if(tab==='plano'&&screen==='pratica'&&RUN[practice.kind]){startCountdown()}
+ window.scrollTo(0,0);
+}
+function startCountdown(){
+ var st=RUN[practice.kind].steps[practice.i];if(!st.s)return;
+ var n=st.s,el=$('#cd');
+ timers.push(setInterval(function(){n=Math.max(0,n-1);if(el)el.textContent=n;if(n===0)clearInterval(timers[0])},1000));
+}
+function startBreath(){
+ var orb=$('#orb'),lab=$('#orbLabel'),cnt=$('#orbCount'),btn=$('#breathBtn'),total=60,t=0;
+ btn.textContent='Parar';
+ function tick(){
+  var c=t%10;
+  if(c===0){orb.style.transitionDuration='4s';orb.style.transform='scale(1)';lab.textContent='Inspire pelo nariz'}
+  if(c===4){orb.style.transitionDuration='6s';orb.style.transform='scale(.62)';lab.textContent='Solte o ar devagar'}
+  cnt.textContent=total-t;t++;
+  if(t>total){stopTimers();lab.textContent='Pronto. Como você está agora?';cnt.textContent='0';btn.textContent='Repetir'}
+ }
+ tick();timers.push(setInterval(tick,1000));
+}
+function finish(){
+ stopTimers();
+ if(practice.kind==='frase')d.frase=practice.phrase;
+ if(practice.kind==='etapas')d.etapas=practice.texts.filter(function(x){return x.trim()});
+ upsertEntry();screen='depois';render();
+}
+function go(s){screen=s;render()}
+
+/* ---------- eventos ---------- */
+document.addEventListener('click',function(ev0){
+ var el=ev0.target.closest('[data-a]');if(!el)return;
+ var a=el.getAttribute('data-a'),id=el.getAttribute('data-id'),i=parseInt(el.getAttribute('data-i'),10);
+ switch(a){
+  case 'tab':tab=id;render();break;
+  case 'emo':d.emotion=id;render();break;
+  case 'ctx':d.ctx=(d.ctx===id)?'':id;render();break;
+  case 'to-perceba':if(d.emotion)go('perceba');break;
+  case 'to-pause':go('pause');break;
+  case 'sign':var k=d.signs.indexOf(id);if(k>-1)d.signs.splice(k,1);else d.signs.push(id);render();break;
+  case 'int':d.intensity=parseInt(id,10);render();break;
+  case 'to-escolha':go('escolha');break;
+  case 'strat':d.strategy=id;upsertEntry();practice=initPractice(id);go('pratica');break;
+  case 'breath':if(timers.length){stopTimers();$('#breathBtn').textContent='Retomar'}else{startBreath()}break;
+  case 'phrase':practice.phrase=(PHRASES[d.emotion]||PHRASES.outro)[i];render();break;
+  case 'chk':practice.checks[i]=el.checked;break;
+  case 'run-prev':if(practice.i>0){practice.i--;render()}break;
+  case 'run-next':if(practice.i<RUN[practice.kind].steps.length-1){practice.i++;render()}else{finish()}break;
+  case 'finish':finish();break;
+  case 'eval-now':ev=newEv(d.entryId);go('avaliar');break;
+  case 'eval-later':toast('Registro salvo. Avalie quando quiser.');d=newDraft();tab='historico';screen='pause';render();break;
+  case 'eval-open':ev=newEv(id);tab='plano';screen='avaliar';render();break;
+  case 'ev':ev[el.getAttribute('data-key')]=id;render();break;
+  case 'ev-int':ev.depois=parseInt(id,10);render();break;
+  case 'ev-save':saveEv();break;
+  case 'new':d=newDraft();tab='plano';screen='pause';render();break;
+  case 'snd':if(!Snd.play(id)){toast('Não foi possível tocar áudio neste navegador.')}updateSoundUI();break;
+  case 'snd-timer':Snd.timerMin=parseInt(id,10);if(Snd.current){var cur=Snd.current;Snd.current=null;Snd.play(cur)}updateSoundUI();break;
+  case 'copy':copyFicha();break;
+  case 'clear-ask':clearAsk=true;render();break;
+  case 'clear-no':clearAsk=false;render();break;
+  case 'clear-yes':entries=[];lsSet(K_E,entries);clearAsk=false;toast('Registros apagados.');render();break;
+ }
+});
+function newEv(id){var e=entries.filter(function(x){return x.id===id})[0]||{};return {id:id,usei:e.usei||'',depois:e.depois||e.intensity||3,ajudou:e.ajudou||'',funcionou:e.funcionou||'',ajustar:e.ajustar||''}}
+function saveEv(){
+ var e=entries.filter(function(x){return x.id===ev.id})[0];if(!e)return;
+ e.usei=ev.usei;e.depois=ev.depois;e.ajudou=ev.ajudou;e.funcionou=ev.funcionou.trim();e.ajustar=ev.ajustar.trim();e.pending=false;
+ lsSet(K_E,entries);toast('Avaliação salva.');d=newDraft();tab='historico';screen='pause';render();
+}
+function copyFicha(){
+ var txt=fichaText(),ta=$('#ficha');
+ function fallback(){var det=$('#fichaDet');if(det)det.open=true;var t=$('#ficha');if(t){t.focus();t.select()}toast('Selecione o texto e copie.')}
+ try{navigator.clipboard.writeText(txt).then(function(){toast('Ficha copiada.')},fallback)}catch(e){fallback()}
+}
+document.addEventListener('input',function(e){
+ var t=e.target,k=t.getAttribute&&t.getAttribute('data-k');
+ if(t.id==='vol'){Snd.setVol(t.value/100);return}
+ if(!k)return;
+ if(k==='focus')d.focus=t.value;
+ else if(k==='myphrase'){practice.phrase=t.value;var b=$('#bigphrase');if(b)b.textContent=t.value||'Escolha ou escreva uma frase curta'}
+ else if(k==='etapa')practice.texts[parseInt(t.getAttribute('data-i'),10)]=t.value;
+ else if(k==='reflect')practice.reflect=t.value;
+ else if(k==='funcionou'||k==='ajustar')ev[k]=t.value;
+});
+render();
+if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}
+})();
+</script>
+</body>
+</html>
