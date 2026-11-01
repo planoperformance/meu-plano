@@ -430,10 +430,28 @@ var USEI={sim:'Sim',parte:'Em parte',nao:'Não'};
 
 /* ---------- som (gerado no aparelho, sem arquivos) ---------- */
 var Snd={ctx:null,master:null,nodes:[],current:null,timer:null,timerMin:0,vol:.5,gain:null,
+ keep:null,
+ /* No iPhone, o som de páginas web é silenciado pelo modo silencioso. Tocar um áudio mudo em loop e pedir a categoria "playback" faz o som sair normalmente. */
+ keepAlive:function(){
+  try{if(navigator.audioSession)navigator.audioSession.type='playback'}catch(e){}
+  try{
+   if(!this.keep){
+    var n=8000,u=new Uint8Array(44+n),v=new DataView(u.buffer),i;
+    var w=function(o,s){for(var j=0;j<s.length;j++)u[o+j]=s.charCodeAt(j)};
+    w(0,'RIFF');v.setUint32(4,36+n,true);w(8,'WAVEfmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);
+    v.setUint32(24,8000,true);v.setUint32(28,8000,true);v.setUint16(32,1,true);v.setUint16(34,8,true);w(36,'data');v.setUint32(40,n,true);
+    for(i=0;i<n;i++)u[44+i]=128;
+    var a=new Audio(URL.createObjectURL(new Blob([u],{type:'audio/wav'})));a.loop=true;a.setAttribute('playsinline','');this.keep=a;
+   }
+   var pr=this.keep.play();if(pr&&pr.catch)pr.catch(function(){});
+  }catch(e){}
+ },
  init:function(){
+  this.keepAlive();
   if(!this.ctx){var AC=window.AudioContext||window.webkitAudioContext;if(!AC)return false;
    try{this.ctx=new AC();}catch(e){return false}
-   this.master=this.ctx.createGain();this.master.gain.value=this.vol;this.master.connect(this.ctx.destination);}
+   this.master=this.ctx.createGain();this.master.gain.value=this.vol;this.master.connect(this.ctx.destination);
+   try{var ub=this.ctx.createBuffer(1,1,22050),us=this.ctx.createBufferSource();us.buffer=ub;us.connect(this.ctx.destination);us.start(0)}catch(e){}}
   if(this.ctx.state==='suspended'){try{this.ctx.resume()}catch(e){}}
   return true;},
  buf:function(kind){var c=this.ctx,n=c.sampleRate*4,b=c.createBuffer(1,n,c.sampleRate),d=b.getChannelData(0),last=0,i;
@@ -461,12 +479,15 @@ var Snd={ctx:null,master:null,nodes:[],current:null,timer:null,timerMin:0,vol:.5
    [[110,-3],[110,3],[164.81,0],[220,2],[277.18,-2]].forEach(function(p){var o=Snd.osc(p[0],p[1]);o.connect(lp3);o.start()});
    lp3.connect(pg);pg.connect(g);
   }
+  g.gain.setValueAtTime(0,c.currentTime);
   g.gain.linearRampToValueAtTime(1,c.currentTime+2);
   this.current=id;
+  setTimeout(function(){if(Snd.current===id&&Snd.ctx&&Snd.ctx.state!=='running'){toast('O som não iniciou. Aumente o volume e desligue o modo silencioso do aparelho.')}},1200);
   if(this.timerMin>0){var self=this;this.timer=setTimeout(function(){self.stop();updateSoundUI()},this.timerMin*60000)}
   return true;},
  stop:function(quiet){
   clearTimeout(this.timer);this.timer=null;
+  if(!quiet&&this.keep){try{this.keep.pause()}catch(e){}}
   var nodes=this.nodes,g=this.gain;this.nodes=[];this.gain=null;this.current=null;
   if(g&&this.ctx){try{g.gain.cancelScheduledValues(this.ctx.currentTime);g.gain.setValueAtTime(g.gain.value,this.ctx.currentTime);g.gain.linearRampToValueAtTime(0,this.ctx.currentTime+1.2)}catch(e){}}
   setTimeout(function(){nodes.forEach(function(n){try{n.stop()}catch(e){}try{n.disconnect()}catch(e){}});if(g){try{g.disconnect()}catch(e){}}},1400);
@@ -701,6 +722,7 @@ function soundPanel(){
 function sonsHTML(){
  return '<section><p class="eyebrow">Sons</p><h1>Acalmar o ambiente</h1><p class="lead">Sons contínuos ajudam a baixar o ritmo antes de treinar ou de competir. Teste antes, em um momento tranquilo, para saber qual funciona para você.</p>'+
   '<div class="card sndpanel">'+soundPanel()+'</div>'+
+  '<p class="small">Se não ouvir nada, aumente o volume do aparelho e desligue o modo silencioso (botão lateral do iPhone).</p>'+
   '<div class="card"><h2>Prefere música?</h2><p class="small">Procure uma playlist de relaxamento no seu aplicativo preferido e deixe-a pronta antes do treino. Os links abrem em outra aba.</p>'+
   '<div class="btnrow"><a class="btn ghost" href="https://open.spotify.com/search/relaxamento" target="_blank" rel="noopener">Buscar no Spotify</a><a class="btn ghost" href="https://www.youtube.com/results?search_query=m%C3%BAsica+relaxante+para+atletas" target="_blank" rel="noopener">Buscar no YouTube</a></div></div></section>';
 }
